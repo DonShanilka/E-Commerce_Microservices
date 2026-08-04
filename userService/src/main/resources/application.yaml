@@ -7,9 +7,9 @@ spring:
     name: user-service
 
   datasource:
-    url: jdbc:postgresql://localhost:5432/ecommerce_user
-    username: postgres
-    password: password
+    url: jdbc:postgresql://localhost:5432/ecommerce
+    username: root
+    password: Shanilka800@#
 
   jpa:
     hibernate:
