@@ -1,9 +1,10 @@
 package lk.ijse.userservice.dto;
 
-import lombok.Builder;
-import lombok.Data;
+import lombok.*;
 
 @Data
+@NoArgsConstructor
+@AllArgsConstructor
 @Builder
 public class UserResponseDto {
 
@@ -13,6 +14,5 @@ public class UserResponseDto {
     private String email;
     private String phone;
     private String role;
-    private String imageUrl;
-
+    private String image;
 }

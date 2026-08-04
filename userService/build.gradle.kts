@@ -2,12 +2,10 @@ plugins {
     java
     id("org.springframework.boot") version "4.1.0"
     id("io.spring.dependency-management") version "1.1.7"
-    id("org.graalvm.buildtools.native") version "1.1.1"
 }
 
 group = "lk.ijse"
 version = "0.0.1-SNAPSHOT"
-description = "userService"
 
 java {
     toolchain {
@@ -21,33 +19,63 @@ repositories {
 
 extra["springCloudVersion"] = "2025.1.2"
 
+
 dependencies {
+
+    // Spring Boot
+    implementation("org.springframework.boot:spring-boot-starter-web")
+    implementation("org.springframework.boot:spring-boot-starter-validation")
+
+    // Database
     implementation("org.springframework.boot:spring-boot-starter-data-jpa")
-    implementation("org.springframework.boot:spring-boot-starter-actuator")
-    implementation("org.springframework.boot:spring-boot-starter-amqp")
+    runtimeOnly("org.postgresql:postgresql")
+
+    // Security
     implementation("org.springframework.boot:spring-boot-starter-security")
-    implementation("org.springframework.boot:spring-boot-starter-security-oauth2-client")
-    implementation("org.springframework.boot:spring-boot-starter-webmvc")
-    implementation("org.springframework.cloud:spring-cloud-starter-config")
+
+    // Monitoring
+    implementation("org.springframework.boot:spring-boot-starter-actuator")
+
+
+    // Eureka Client
     implementation("org.springframework.cloud:spring-cloud-starter-netflix-eureka-client")
+
+
+    // OpenFeign communication
+    implementation("org.springframework.cloud:spring-cloud-starter-openfeign")
+
+
+    // RabbitMQ
+    implementation("org.springframework.boot:spring-boot-starter-amqp")
+
+
+    // Lombok
     compileOnly("org.projectlombok:lombok")
-    developmentOnly("org.springframework.boot:spring-boot-devtools")
     annotationProcessor("org.projectlombok:lombok")
-    testImplementation("org.springframework.boot:spring-boot-starter-actuator-test")
-    testImplementation("org.springframework.boot:spring-boot-starter-amqp-test")
-    testImplementation("org.springframework.boot:spring-boot-starter-security-oauth2-client-test")
-    testImplementation("org.springframework.boot:spring-boot-starter-security-test")
-    testImplementation("org.springframework.boot:spring-boot-starter-webmvc-test")
-    testCompileOnly("org.projectlombok:lombok")
-    testRuntimeOnly("org.junit.platform:junit-platform-launcher")
-    testAnnotationProcessor("org.projectlombok:lombok")
+
+
+    // Development
+    developmentOnly("org.springframework.boot:spring-boot-devtools")
+
+
+    // Testing
+    testImplementation("org.springframework.boot:spring-boot-starter-test")
+    testImplementation("org.springframework.security:spring-security-test")
+
+    implementation ("com.fasterxml.jackson.core:jackson-databind")
 }
 
+
 dependencyManagement {
+
     imports {
-        mavenBom("org.springframework.cloud:spring-cloud-dependencies:${property("springCloudVersion")}")
+        mavenBom(
+            "org.springframework.cloud:spring-cloud-dependencies:${property("springCloudVersion")}"
+        )
     }
+
 }
+
 
 tasks.withType<Test> {
     useJUnitPlatform()

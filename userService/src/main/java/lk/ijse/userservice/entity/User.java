@@ -5,13 +5,12 @@ import lombok.*;
 
 import java.time.LocalDateTime;
 
-
 @Entity
-@Table(name="users")
+@Table(name = "users")
 @Getter
 @Setter
-@AllArgsConstructor
 @NoArgsConstructor
+@AllArgsConstructor
 @Builder
 public class User {
 
@@ -19,32 +18,35 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(nullable = false)
     private String firstName;
+
+    @Column(nullable = false)
     private String lastName;
 
-    @Column(unique = true)
+    @Column(nullable = false, unique = true)
     private String email;
+
+    @Column(nullable = false)
     private String password;
+
     private String phone;
     private String role;
-    private String imageName;
-    private String imageType;
 
-    @Lob
-    @Column(columnDefinition = "BYTEA")
-    private byte[] image;
+    @Column(columnDefinition = "LONGTEXT")
+    private String image;
 
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
     @PrePersist
-    public void created(){
+    public void prePersist(){
         createdAt = LocalDateTime.now();
-    }
-
-    @PreUpdate
-    public void updated(){
         updatedAt = LocalDateTime.now();
     }
 
+    @PreUpdate
+    public void preUpdate(){
+        updatedAt = LocalDateTime.now();
+    }
 }
