@@ -1,4 +1,4 @@
 package lk.ijse.userservice.exception;
 
-public class ResourceNotFoundException {
+public class ResourceNotFoundException extends RuntimeException{
 }
