@@ -12,6 +12,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.sql.SQLOutput;
+
 @RestController
 @RequestMapping("/api/v1/users")
 @RequiredArgsConstructor
@@ -21,7 +23,7 @@ public class UserController {
     private final UserService userService;
 
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<UserResponseDto> createUser(
+    public ResponseEntity<?> createUser(
             @RequestPart("firstName") String firstName,
             @RequestPart("lastName") String lastName,
             @RequestPart("email") String email,
@@ -48,12 +50,21 @@ public class UserController {
                             .build();
 
             UserResponseDto response = userService.createUser(dto);
+
+//            if (response.equals(email)) {
+//                System.out.println("Email Already Exists");
+//                return ResponseEntity
+//                        .status(HttpStatus.CONFLICT)
+//                        .body("Email" + " already exists.");
+//            }
+
             System.out.println("Response User : " + response);
 
-            return new ResponseEntity<>(response, HttpStatus.CREATED);
-        }catch(Exception e){
-            e.printStackTrace();
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+            return ResponseEntity.status(HttpStatus.CREATED).body(response);
+        } catch (Exception e) {
+            return ResponseEntity
+                    .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(e.getMessage());
         }
     }
 

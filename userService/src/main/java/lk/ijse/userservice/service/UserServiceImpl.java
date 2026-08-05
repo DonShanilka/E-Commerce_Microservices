@@ -3,6 +3,7 @@ package lk.ijse.userservice.service;
 import lk.ijse.userservice.dto.UserRequestDto;
 import lk.ijse.userservice.dto.UserResponseDto;
 import lk.ijse.userservice.entity.User;
+import lk.ijse.userservice.exception.DataPersistException;
 import lk.ijse.userservice.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,6 +33,10 @@ public class UserServiceImpl implements UserService{
 
     @Override
     public UserResponseDto createUser(UserRequestDto dto) {
+        if (userRepository.existsByEmail(dto.getEmail())) {
+            System.out.println(dto.getEmail() + " : User Email Already Exist");
+            throw new DataPersistException(dto.getEmail() + " : User Email Already Exist");
+        }
 
         User user = User.builder()
                 .firstName(dto.getFirstName())
