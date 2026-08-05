@@ -2,6 +2,7 @@ package lk.ijse.userservice.controller;
 
 import lk.ijse.userservice.dto.UserRequestDto;
 import lk.ijse.userservice.dto.UserResponseDto;
+import lk.ijse.userservice.exception.DataPersistException;
 import lk.ijse.userservice.service.UserService;
 import lk.ijse.userservice.util.AppUtil;
 import lombok.RequiredArgsConstructor;
@@ -12,7 +13,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.sql.SQLOutput;
 
 @RestController
 @RequestMapping("/api/v1/users")
@@ -61,6 +61,50 @@ public class UserController {
             System.out.println("Response User : " + response);
 
             return ResponseEntity.status(HttpStatus.CREATED).body(response);
+        } catch (Exception e) {
+            return ResponseEntity
+                    .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(e.getMessage());
+        }
+    }
+
+    @PutMapping(
+            consumes = MediaType.MULTIPART_FORM_DATA_VALUE,
+            produces = MediaType.APPLICATION_JSON_VALUE
+    )
+    public ResponseEntity<?> updateUser(
+            @RequestParam("id") Long id,
+            @RequestParam(value = "firstName", required = false) String firstName,
+            @RequestParam(value = "lastName", required = false) String lastName,
+            @RequestParam(value = "email", required = false) String email,
+            @RequestParam(value = "phone", required = false) String phone,
+            @RequestParam(value = "role", required = false) String role,
+            @RequestParam(value = "image", required = false) MultipartFile image
+    ) {
+        try {
+
+            String imageBase64 = null;
+            if (image != null && !image.isEmpty()) {
+                imageBase64 = AppUtil.imageBase64(image.getBytes());
+            }
+
+            UserRequestDto dto = UserRequestDto.builder()
+                    .id(id)
+                    .firstName(firstName)
+                    .lastName(lastName)
+                    .email(email)
+                    .phone(phone)
+                    .role(role)
+                    .image(imageBase64)
+                    .build();
+
+            UserResponseDto response = userService.update(dto);
+
+            return ResponseEntity.ok(response);
+        } catch (DataPersistException e) {
+            return ResponseEntity
+                    .status(HttpStatus.NOT_FOUND)
+                    .body(e.getMessage());
         } catch (Exception e) {
             return ResponseEntity
                     .status(HttpStatus.INTERNAL_SERVER_ERROR)
