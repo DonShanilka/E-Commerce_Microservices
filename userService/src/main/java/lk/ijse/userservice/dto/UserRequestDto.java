@@ -8,6 +8,7 @@ import lombok.*;
 @Builder
 public class UserRequestDto {
 
+    private Long id;
     private String firstName;
     private String lastName;
     private String email;

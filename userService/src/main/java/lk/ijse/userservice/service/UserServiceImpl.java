@@ -73,8 +73,58 @@ public class UserServiceImpl implements UserService{
     }
 
     @Override
-    public UserResponseDto update(Long id, UserRequestDto dto, MultipartFile image) {
-        return null;
+    public UserResponseDto update(UserRequestDto dto) {
+
+        User user = userRepository.findById(dto.getId())
+                .orElseThrow(() ->
+                        new DataPersistException("User ID " + dto.getId() + " does not exist."));
+
+        // Update first name
+        if (dto.getFirstName() != null && !dto.getFirstName().trim().isEmpty()) {
+            user.setFirstName(dto.getFirstName());
+        }
+
+        // Update last name
+        if (dto.getLastName() != null && !dto.getLastName().trim().isEmpty()) {
+            user.setLastName(dto.getLastName());
+        }
+
+        // Update email
+        if (dto.getEmail() != null && !dto.getEmail().trim().isEmpty()) {
+            if (!dto.getEmail().equals(user.getEmail())
+                    && userRepository.existsByEmail(dto.getEmail())) {
+                throw new DataPersistException("Email already exists: " + dto.getEmail());
+            }
+            user.setEmail(dto.getEmail());
+        }
+
+        // Update phone
+        if (dto.getPhone() != null && !dto.getPhone().trim().isEmpty()) {
+            user.setPhone(dto.getPhone());
+        }
+
+        // Update role
+        if (dto.getRole() != null && !dto.getRole().trim().isEmpty()) {
+            user.setRole(dto.getRole());
+        }
+
+        // Update image
+        if (dto.getImage() != null && !dto.getImage().trim().isEmpty()) {
+            user.setImage(dto.getImage());
+        }
+        // Password is Not Update
+
+        User updatedUser = userRepository.save(user);
+
+        return UserResponseDto.builder()
+                .id(updatedUser.getId())
+                .firstName(updatedUser.getFirstName())
+                .lastName(updatedUser.getLastName())
+                .email(updatedUser.getEmail())
+                .phone(updatedUser.getPhone())
+                .role(updatedUser.getRole())
+                .image(updatedUser.getImage())
+                .build();
     }
 
     @Override

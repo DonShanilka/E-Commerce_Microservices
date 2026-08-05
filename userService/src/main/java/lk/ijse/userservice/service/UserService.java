@@ -10,7 +10,7 @@ public interface UserService {
     UserResponseDto createUser(UserRequestDto dto);
     List<UserResponseDto> getAll();
     UserResponseDto getById(Long id);
-    UserResponseDto update(Long id, UserRequestDto dto, MultipartFile image);
+    UserResponseDto update(UserRequestDto dto);
     void delete(Long id);
 
 }
