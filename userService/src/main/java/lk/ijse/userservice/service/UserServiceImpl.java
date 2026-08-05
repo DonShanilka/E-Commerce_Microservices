@@ -128,6 +128,10 @@ public class UserServiceImpl implements UserService{
 
     @Override
     public void delete(Long id) {
+        User user = userRepository.findById(id)
+                .orElseThrow(() ->
+                        new DataPersistException("User ID " + id + " does not exist."));
 
+        userRepository.delete(user);
     }
 }
