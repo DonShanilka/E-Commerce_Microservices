@@ -63,12 +63,36 @@ public class UserServiceImpl implements UserService{
 
     @Override
     public List<UserResponseDto> getAll() {
-        return List.of();
+
+        List<User> users = userRepository.findAll();
+            return users.stream()
+                .map(user -> UserResponseDto.builder()
+                        .id(user.getId())
+                        .firstName(user.getFirstName())
+                        .lastName(user.getLastName())
+                        .email(user.getEmail())
+                        .phone(user.getPhone())
+                        .role(user.getRole())
+                        .image(user.getImage())
+                        .build())
+                .toList();
     }
 
     @Override
     public UserResponseDto getById(Long id) {
-        return null;
+        User user = userRepository.findById(id)
+                .orElseThrow(() ->
+                        new DataPersistException("User ID " + id + " does not exist."));
+
+        return UserResponseDto.builder()
+                .id(user.getId())
+                .firstName(user.getFirstName())
+                .lastName(user.getLastName())
+                .email(user.getEmail())
+                .phone(user.getPhone())
+                .role(user.getRole())
+                .image(user.getImage())
+                .build();
     }
 
     @Override
