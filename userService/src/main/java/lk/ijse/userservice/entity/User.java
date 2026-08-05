@@ -33,7 +33,7 @@ public class User {
     private String phone;
     private String role;
 
-    @Column(columnDefinition = "LONGTEXT")
+    @Column(columnDefinition = "TEXT")
     private String image;
 
     private LocalDateTime createdAt;
