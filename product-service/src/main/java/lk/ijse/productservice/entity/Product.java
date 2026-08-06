@@ -1,6 +1,7 @@
 package lk.ijse.productservice.entity;
 
 import jakarta.persistence.*;
+import jakarta.persistence.Table;
 import lombok.*;
 import org.hibernate.annotations.*;
 import java.time.LocalDateTime;
@@ -32,6 +33,8 @@ public class Product {
 
     private String category;
     private String brand;
+
+    @Column(columnDefinition = "TEXT")
     private String image;
 
     @CreationTimestamp
