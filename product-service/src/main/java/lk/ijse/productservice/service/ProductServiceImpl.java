@@ -92,7 +92,11 @@ public class ProductServiceImpl implements ProductService{
 
     @Override
     public void delete(Long id) {
+        Product product = productRepository.findById(id)
+                .orElseThrow(() ->
+                        new DataPersistException("Product not found : " + id));
 
+        productRepository.delete(product);
     }
 
     @Override
