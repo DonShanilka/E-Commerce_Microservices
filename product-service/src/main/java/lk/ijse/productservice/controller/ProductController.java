@@ -59,4 +59,40 @@ public class ProductController {
         }
     }
 
+    @PutMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<?> updateProduct(
+            @RequestParam("id") Long id,
+            @RequestParam(value = "name", required = false) String name,
+            @RequestParam(value = "description", required = false) String description,
+            @RequestParam(value = "price", required = false) Double price,
+            @RequestParam(value = "quantity", required = false) Integer quantity,
+            @RequestParam(value = "category", required = false) String category,
+            @RequestParam(value = "brand", required = false) String brand,
+            @RequestParam(value = "image", required = false) MultipartFile image
+    ) {
+        try {
+
+            String imageBase64 = null;
+            if (image != null && !image.isEmpty()) {
+                imageBase64 = AppUtil.imageBase64(image.getBytes());
+            }
+
+            ProductRequestDto dto = ProductRequestDto.builder()
+                    .id(id)
+                    .name(name)
+                    .description(description)
+                    .price(price)
+                    .quantity(quantity)
+                    .category(category)
+                    .brand(brand)
+                    .image(imageBase64)
+                    .build();
+
+            return ResponseEntity.ok(productService.update(dto));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(e.getMessage());
+        }
+    }
+
 }

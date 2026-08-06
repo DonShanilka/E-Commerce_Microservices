@@ -51,7 +51,43 @@ public class ProductServiceImpl implements ProductService{
 
     @Override
     public ProductResponseDto update(ProductRequestDto dto) {
-        return null;
+        Product product = productRepository.findById(dto.getId())
+                .orElseThrow(() ->
+                        new DataPersistException("Product not found : " + dto.getId()));
+
+        if (dto.getName() != null)
+            product.setName(dto.getName());
+
+        if (dto.getDescription() != null)
+            product.setDescription(dto.getDescription());
+
+        if (dto.getPrice() != null)
+            product.setPrice(dto.getPrice());
+
+        if (dto.getQuantity() != null)
+            product.setQuantity(dto.getQuantity());
+
+        if (dto.getCategory() != null)
+            product.setCategory(dto.getCategory());
+
+        if (dto.getBrand() != null)
+            product.setBrand(dto.getBrand());
+
+        if (dto.getImage() != null)
+            product.setImage(dto.getImage());
+
+        Product updateProduct = productRepository.save(product);
+
+        return ProductResponseDto.builder()
+                .id(updateProduct.getId())
+                .name(updateProduct.getName())
+                .description(updateProduct.getDescription())
+                .price(updateProduct.getPrice())
+                .quantity(updateProduct.getQuantity())
+                .category(updateProduct.getCategory())
+                .brand(updateProduct.getBrand())
+                .image(updateProduct.getImage())
+                .build();
     }
 
     @Override
