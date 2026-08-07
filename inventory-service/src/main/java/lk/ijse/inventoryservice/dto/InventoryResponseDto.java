@@ -10,6 +10,7 @@ import lombok.*;
 public class InventoryResponseDto {
 
     private Long id;
+    private Long productId;
     private Integer quantity;
     private Integer reservedQuantity;
     private Integer availableQuantity;
