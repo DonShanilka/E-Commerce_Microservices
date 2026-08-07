@@ -1,4 +1,14 @@
 package lk.ijse.inventoryservice.repository;
 
-public class InventoryRepository {
+import lk.ijse.inventoryservice.entity.Inventory;
+import org.springframework.data.jpa.repository.JpaRepository;
+
+
+import java.util.Optional;
+
+
+public interface InventoryRepository extends JpaRepository<Inventory,Long> {
+
+    Optional<Inventory> findByProductId(Long productId);
+
 }
