@@ -33,12 +33,18 @@ public class InventoryServiceImpl implements InventoryService{
 
     @Override
     public InventoryResponseDto getByProductId(Long productId) {
-        return null;
+            Inventory inventory = repository.findByProductId(productId)
+                    .orElseThrow(() -> new RuntimeException("Product stock not found"));
+            return map(inventory);
     }
 
     @Override
     public List<InventoryResponseDto> getAll() {
-        return List.of();
+        return repository.findAll()
+                .stream()
+                .map(this::map)
+                .toList();
+
     }
 
     @Override

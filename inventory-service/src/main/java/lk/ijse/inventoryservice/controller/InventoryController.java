@@ -6,10 +6,9 @@ import lk.ijse.inventoryservice.service.InventoryService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/inventory")
@@ -22,6 +21,16 @@ public class InventoryController {
     @PostMapping
     public ResponseEntity<InventoryResponseDto> create(@RequestBody InventoryRequestDto dto){
         return ResponseEntity.ok(service.create(dto));
+    }
+
+    @GetMapping
+    public ResponseEntity<List<InventoryResponseDto>> getAll(){
+        return ResponseEntity.ok(service.getAll());
+    }
+
+    @GetMapping("/{productId}")
+    public ResponseEntity<InventoryResponseDto> getByProduct(@PathVariable Long productId){
+        return ResponseEntity.ok(service.getByProductId(productId));
     }
 
 }
