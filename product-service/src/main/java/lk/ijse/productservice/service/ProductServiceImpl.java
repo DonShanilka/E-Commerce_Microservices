@@ -101,11 +101,35 @@ public class ProductServiceImpl implements ProductService{
 
     @Override
     public ProductResponseDto getById(Long id) {
-        return null;
+        Product product = productRepository.findById(id)
+                .orElseThrow(() -> new DataPersistException("Product ID " + id + " does not exist. "));
+
+        return ProductResponseDto.builder()
+                .id(product.getId())
+                .name(product.getName())
+                .description(product.getDescription())
+                .price(product.getPrice())
+                .quantity(product.getQuantity())
+                .category(product.getCategory())
+                .brand(product.getBrand())
+                .image(product.getImage())
+                .build();
     }
 
     @Override
     public List<ProductResponseDto> getAll() {
-        return List.of();
+       List<Product> products = productRepository.findAll();
+            return products.stream()
+                    .map(product -> ProductResponseDto.builder()
+                            .id(product.getId())
+                            .name(product.getName())
+                            .description(product.getDescription())
+                            .price(product.getPrice())
+                            .quantity(product.getQuantity())
+                            .category(product.getCategory())
+                            .brand(product.getBrand())
+                            .image(product.getImage())
+                            .build())
+                    .toList();
     }
 }
