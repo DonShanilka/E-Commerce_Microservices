@@ -4,7 +4,6 @@ import lk.ijse.inventoryservice.dto.InventoryRequestDto;
 import lk.ijse.inventoryservice.dto.InventoryResponseDto;
 import lk.ijse.inventoryservice.service.InventoryService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -15,7 +14,6 @@ import java.util.List;
 @RequiredArgsConstructor
 public class InventoryController {
 
-    @Autowired
     private final InventoryService service;
 
     @PostMapping
@@ -33,4 +31,10 @@ public class InventoryController {
         return ResponseEntity.ok(service.getByProductId(productId));
     }
 
+    @PutMapping("/{productId}/reduce") public ResponseEntity<String> reduceStock(
+            @PathVariable Long productId,
+            @RequestParam Integer quantity) {
+                service.reduceStock(productId, quantity);
+                return ResponseEntity.ok( "Stock reduced successfully" );
+    }
 }
