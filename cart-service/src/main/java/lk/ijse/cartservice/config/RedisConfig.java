@@ -5,7 +5,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
+import org.springframework.data.redis.serializer.JacksonJsonRedisSerializer;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 
 @Configuration
@@ -19,20 +19,24 @@ public class RedisConfig {
 
         template.setConnectionFactory(connectionFactory);
 
+        // Key
         template.setKeySerializer(
                 new StringRedisSerializer()
         );
 
+        // Value
         template.setValueSerializer(
-                new GenericJackson2JsonRedisSerializer()
+                new JacksonJsonRedisSerializer<>(Cart.class)
         );
 
+        // Hash key
         template.setHashKeySerializer(
                 new StringRedisSerializer()
         );
 
+        // Hash value
         template.setHashValueSerializer(
-                new GenericJackson2JsonRedisSerializer()
+                new JacksonJsonRedisSerializer<>(Cart.class)
         );
 
         template.afterPropertiesSet();
