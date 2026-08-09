@@ -37,17 +37,19 @@ public class CartController {
             @RequestParam Integer quantity) {
 
         return ResponseEntity.ok(
-                cartService.updateQuantity(
-                        userId,
-                        productId,
-                        quantity
-                )
+                cartService.updateQuantity(userId, productId, quantity)
         );
     }
 
     @DeleteMapping("/{userId}/{productId}")
     public ResponseEntity<Void> removeFromCart(@PathVariable Long userId, @PathVariable Long productId) {
         cartService.removeFromCart(userId, productId);
+        return ResponseEntity.noContent().build();
+    }
+
+    @DeleteMapping("/{userId}")
+    public ResponseEntity<Void> clearCart(@PathVariable Long userId) {
+        cartService.clearCart(userId);
         return ResponseEntity.noContent().build();
     }
 

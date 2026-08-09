@@ -122,7 +122,7 @@ public class CartServiceImpl implements CartService{
 
     @Override
     public void clearCart(Long userId) {
-
+        cartRepository.deleteByUserId(userId);
     }
 
     private void calculateTotal(Cart cart) {
