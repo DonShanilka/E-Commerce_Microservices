@@ -109,6 +109,15 @@ public class CartServiceImpl implements CartService{
     @Override
     public void removeFromCart(Long userId, Long productId) {
 
+            Cart cart = cartRepository.findByUserId(userId);
+            if (cart == null) {
+                throw new RuntimeException("Cart not found");
+            }
+
+            cart.getItems().removeIf(item -> item.getProductId().equals(productId));
+
+            calculateTotal(cart);
+            cartRepository.save(cart);
     }
 
     @Override
