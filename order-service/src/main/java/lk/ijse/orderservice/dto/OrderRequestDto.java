@@ -14,10 +14,10 @@ import java.util.List;
 @Builder
 public class OrderRequestDto {
 
-    @NotNull
+    @NotNull(message = "User ID is required")
     private Long userId;
 
-    @NotEmpty
-    @Valid
-    private List<OrderItemRequestDto> items;
+    @NotEmpty(message = "Order must contain at least one item")
+    private List<@Valid OrderItemRequestDto> items;
 }
+
