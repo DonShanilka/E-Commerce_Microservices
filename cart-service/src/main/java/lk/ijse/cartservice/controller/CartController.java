@@ -23,4 +23,26 @@ public class CartController {
                 .body(cartService.addToCart(dto));
     }
 
+    @GetMapping("/{userId}")
+    public ResponseEntity<CartResponseDto> getCart(@PathVariable Long userId) {
+        return ResponseEntity.ok(
+                cartService.getCart(userId)
+        );
+    }
+
+    @PutMapping("/{userId}/{productId}")
+    public ResponseEntity<CartResponseDto> updateQuantity(
+            @PathVariable Long userId,
+            @PathVariable Long productId,
+            @RequestParam Integer quantity) {
+
+        return ResponseEntity.ok(
+                cartService.updateQuantity(
+                        userId,
+                        productId,
+                        quantity
+                )
+        );
+    }
+
 }

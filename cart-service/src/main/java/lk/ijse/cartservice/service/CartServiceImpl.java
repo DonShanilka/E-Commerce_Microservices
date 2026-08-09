@@ -69,12 +69,41 @@ public class CartServiceImpl implements CartService{
 
     @Override
     public CartResponseDto getCart(Long userId) {
-        return null;
+        Cart cart = cartRepository.findByUserId(userId);
+
+        if (cart == null) {
+            return CartResponseDto.builder()
+                    .userId(userId)
+                    .items(new ArrayList<>())
+                    .total(0.0)
+                    .build();
+        }
+
+        return convertToResponse(cart);
     }
 
     @Override
     public CartResponseDto updateQuantity(Long userId, Long productId, Integer quantity) {
-        return null;
+
+            Cart cart = cartRepository.findByUserId(userId);
+            if (cart == null) {
+                throw new RuntimeException("Cart not found");
+            }
+
+            CartItem item = cart.getItems()
+                    .stream()
+                    .filter(i -> i.getProductId().equals(productId))
+                    .findFirst()
+                    .orElseThrow(() ->
+                            new RuntimeException("Product not found in cart"));
+
+            item.setQuantity(quantity);
+            item.setSubtotal(item.getPrice() * quantity);
+
+            calculateTotal(cart);
+            cartRepository.save(cart);
+
+            return convertToResponse(cart);
     }
 
     @Override
@@ -115,4 +144,5 @@ public class CartServiceImpl implements CartService{
                 .total(cart.getTotal())
                 .build();
     }
+
 }
