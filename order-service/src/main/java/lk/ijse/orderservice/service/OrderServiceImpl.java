@@ -88,12 +88,24 @@ public class OrderServiceImpl implements OrderService{
 
     @Override
     public OrderResponseDto updateStatus(Long id, String status) {
-        return null;
+            Order order = orderRepository.findById(id)
+                    .orElseThrow(() ->
+                            new RuntimeException(
+                                    "Order ID " + id + " does not exist"
+                            )
+                    );
+            order.setStatus(OrderStatus.valueOf(status.toUpperCase()));
+            return mapToResponse(orderRepository.save(order));
     }
 
     @Override
     public void delete(Long id) {
-
+        if (!orderRepository.existsById(id)) {
+            throw new RuntimeException(
+                    "Order ID " + id + " does not exist"
+            );
+        }
+        orderRepository.deleteById(id);
     }
 
     private OrderResponseDto mapToResponse(Order order) {
