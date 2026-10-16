@@ -15,19 +15,18 @@ Backend-only AI service scaffold for `E-Commerce_Microservices`.
 Java 25 and an OpenAI-compatible Chat Completions API.
 
 ## Environment variables
-```bash
-export PRODUCT_SERVICE_BASE_URL=http://localhost:8082
-export AI_API_BASE_URL=https://api.openai.com/v1
-export AI_API_KEY='your-api-key'
-export AI_MODEL='gpt-4.1-mini'
+```powershell
+$env:PRODUCT_SERVICE_BASE_URL = "http://localhost:8082"
+$env:AI_API_BASE_URL = "https://api.groq.com/openai/v1"
+$env:AI_API_KEY = "your-api-key"
+$env:AI_MODEL = "openai/gpt-oss-20b"
 ```
 Never commit the API key. Set it in your IDE run configuration or shell environment. `AI_API_BASE_URL` is the provider base URL; `/chat/completions` is appended automatically.
 
 ## Run
-This archive intentionally omits Gradle wrapper binaries. Copy `gradlew`, `gradlew.bat`, and `gradle/wrapper/` from an existing service folder into this folder, then:
-```bash
-chmod +x gradlew
-./gradlew bootRun
+The Gradle wrapper is included in this service. From PowerShell, set the required environment variables and run:
+```powershell
+.\gradlew.bat bootRun
 ```
 Default port: 8087. Product Service is expected at `http://localhost:8082` and catalog endpoint `GET /api/v1/products`. If your actual API response differs, update `catalog()` in `AiController.java`.
 
@@ -57,3 +56,6 @@ curl -X POST http://localhost:8087/api/v1/ai/forecast -H 'Content-Type: applicat
 - Review sentiment analysis accepts review text directly; integrating it automatically with Review Service is a follow-up step.
 - Demand forecasting accepts historical sales observations from the caller; integrate Order Service and validate sufficient real history before using forecasts for inventory decisions.
 - Add authentication, authorization, rate limiting, tests, and provider-specific timeout/retry handling before production.
+
+
+
