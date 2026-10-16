@@ -1,18 +1,22 @@
 server:
   port: ${SERVER_PORT:8087}
+
 spring:
   application:
     name: ai-service
+
 management:
   endpoints:
     web:
       exposure:
         include: health,info
+
 ai:
   api:
-    base-url: ${AI_API_BASE_URL:https://api.openai.com/v1}
+    base-url: ${AI_API_BASE_URL:https://api.groq.com/openai/v1}
     key: ${AI_API_KEY:}
-    model: ${AI_MODEL:gpt-4.1-mini}
+    model: ${AI_MODEL:openai/gpt-oss-20b}
+
 product-service:
   base-url: ${PRODUCT_SERVICE_BASE_URL:http://localhost:8082}
   catalog-path: ${PRODUCT_CATALOG_PATH:/api/v1/products}
