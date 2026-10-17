@@ -34,6 +34,7 @@ dependencies {
     annotationProcessor("org.projectlombok:lombok")
     developmentOnly("org.springframework.boot:spring-boot-devtools")
     testImplementation("org.springframework.boot:spring-boot-starter-test")
+    testRuntimeOnly("com.h2database:h2")
     testImplementation("org.springframework.boot:spring-boot-starter-amqp-test")
 }
 

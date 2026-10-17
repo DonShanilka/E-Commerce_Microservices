@@ -1,0 +1,24 @@
+spring:
+  cloud:
+    config:
+      enabled: false
+      import-check:
+        enabled: false
+  rabbitmq:
+    listener:
+      simple:
+        auto-startup: false
+      direct:
+        auto-startup: false
+  datasource:
+    url: jdbc:h2:mem:ecommerce;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+    username: sa
+    password: ""
+    driver-class-name: org.h2.Driver
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    open-in-view: false
+eureka:
+  client:
+    enabled: false

@@ -6,7 +6,7 @@ plugins {
 
 group = "lk.ijse"
 version = "0.0.1-SNAPSHOT"
-description = "E-Commerce_Microservices"
+description = "E-Commerce Config Server"
 
 java {
     toolchain {

@@ -1,1 +1,1 @@
-rootProject.name = "E-Commerce_Microservices"
+rootProject.name = "config-server"

@@ -50,6 +50,7 @@ dependencies {
 
     // Tests
     testImplementation("org.springframework.boot:spring-boot-starter-test")
+    testRuntimeOnly("com.h2database:h2")
     testImplementation("org.springframework.amqp:spring-rabbit-test")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 

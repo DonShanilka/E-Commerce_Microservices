@@ -14,7 +14,7 @@ java {
 
 repositories { mavenCentral() }
 
-extra["springCloudVersion"] = "2025.0.0"
+extra["springCloudVersion"] = "2025.1.2"
 
 dependencies {
     implementation("org.springframework.boot:spring-boot-starter-web")
@@ -26,6 +26,7 @@ dependencies {
     compileOnly("org.projectlombok:lombok")
     annotationProcessor("org.projectlombok:lombok")
     testImplementation("org.springframework.boot:spring-boot-starter-test")
+    testRuntimeOnly("com.h2database:h2")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 }
 
