@@ -351,44 +351,39 @@ public class AiController {
             now = System.currentTimeMillis();
             if (cachedCatalog != null && now < catalogCacheExpiresAt) return cachedCatalog;
             try {
-            String responseBody = http.get().uri(stripSlash(productBase) + catalogPath).retrieve().body(String.class);
-
-            // 2. Handle an empty response
-            if (responseBody == null || responseBody.isBlank()) {
-                return List.of();
-            }
-
-            // 3. Parse JSON using ObjectMapper
-            JsonNode root = mapper.readTree(responseBody);
-
-            // 4. Handle a null JSON root
-            if (root == null || root.isNull()) {
-                return List.of();
-            }
-
-            // 5. If response is a JSON array, return products
-            if (root.isArray()) return cacheCatalog(root);
-
-            // 6. Check common wrapper fields
-            for (String key : List.of("data", "content", "products", "items", "result")) {
-                JsonNode items = root.path(key);
-
-                if (items.isArray()) return cacheCatalog(items);
-            }
-
-            // 7. If response is a single product object
-            if (root.has("id")) return cacheCatalog(mapper.createArrayNode().add(root));
-
-            // 8. No recognized product structure found
-            return List.of();
+                com.fasterxml.jackson.databind.node.ArrayNode all = mapper.createArrayNode();
+                String baseUri = stripSlash(productBase) + catalogPath;
+                String separator = baseUri.contains("?") ? "&" : "?";
+                JsonNode first = mapper.readTree(http.get().uri(baseUri + separator + "page=0&size=100").retrieve().body(String.class));
+                if (first == null || first.isNull()) return cacheCatalog(all);
+                if (first.isArray()) { first.forEach(all::add); return cacheCatalog(all); }
+                JsonNode content = null;
+                for (String key : List.of("content", "data", "products", "items", "result"))
+                    if (first.path(key).isArray()) { content = first.path(key); break; }
+                if (content == null) {
+                    if (first.has("id")) all.add(first);
+                    return cacheCatalog(all);
+                }
+                content.forEach(all::add);
+                int totalPages = first.path("totalPages").asInt(1);
+                if (totalPages > 100) throw new ResponseStatusException(HttpStatus.PAYLOAD_TOO_LARGE, "Catalog exceeds the 10,000 product AI limit.");
+                for (int page = 1; page < totalPages; page++) {
+                    JsonNode response = mapper.readTree(http.get().uri(baseUri + separator + "page=" + page + "&size=100").retrieve().body(String.class));
+                    JsonNode pageItems = response == null ? null : response.path("content");
+                    if (pageItems == null || !pageItems.isArray()) throw new IllegalStateException("Product Service returned an invalid page.");
+                    pageItems.forEach(all::add);
+                }
+                return cacheCatalog(all);
+            } catch (ResponseStatusException e) {
+                throw e;
             } catch (Exception e) {
-                throw new ResponseStatusException(HttpStatus.BAD_GATEWAY, "Could not fetch or parse product catalog. Check Product Service availability and response format.", e);
+                throw new ResponseStatusException(HttpStatus.BAD_GATEWAY, "Could not fetch or parse Product Service catalog.", e);
             }
         }
     }
 
     private List<JsonNode> cacheCatalog(JsonNode array) {
-        if (array.size() > 10000) throw new ResponseStatusException(HttpStatus.PAYLOAD_TOO_LARGE, "Catalog exceeds the supported size; configure paginated catalog search.");
+        if (array.size() > 10000) throw new ResponseStatusException(HttpStatus.PAYLOAD_TOO_LARGE, "Catalog exceeds the 10,000 product AI limit.");
         List<JsonNode> products = new ArrayList<>();
         array.forEach(p -> {
             JsonNode copy = p.deepCopy();

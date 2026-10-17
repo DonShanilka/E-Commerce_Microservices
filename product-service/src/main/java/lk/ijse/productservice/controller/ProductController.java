@@ -2,6 +2,7 @@ package lk.ijse.productservice.controller;
 
 import lk.ijse.productservice.dto.ProductRequestDto;
 import lk.ijse.productservice.dto.ProductResponseDto;
+import lk.ijse.productservice.dto.ProductSummaryDto;
 import lk.ijse.productservice.service.ProductService;
 import lk.ijse.productservice.util.AppUtil;
 import lombok.RequiredArgsConstructor;
@@ -13,6 +14,10 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
+import org.springframework.web.server.ResponseStatusException;
 
 @RestController
 @RequestMapping("/api/v1/products")
@@ -104,8 +109,21 @@ public class ProductController {
     }
 
     @GetMapping
-    public ResponseEntity<List<ProductResponseDto>> getAllProducts() {
-        return ResponseEntity.ok(productService.getAll());
+    public ResponseEntity<Page<ProductSummaryDto>> getProducts(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "20") int size,
+            @RequestParam(required = false) String query,
+            @RequestParam(required = false) String category,
+            @RequestParam(required = false) String brand) {
+        if (page < 0 || size < 1 || size > 100) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "page must be non-negative and size must be between 1 and 100.");
+        }
+        if (query != null && query.length() > 200 || category != null && category.length() > 80 || brand != null && brand.length() > 80) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Search filters exceed their allowed length.");
+        }
+        Page<ProductSummaryDto> products = productService.search(query, category, brand,
+                PageRequest.of(page, size, Sort.by(Sort.Direction.ASC, "id")));
+        return ResponseEntity.ok(products);
     }
 
     @GetMapping("/{id}")

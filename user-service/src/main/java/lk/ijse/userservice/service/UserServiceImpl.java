@@ -8,6 +8,7 @@ import lk.ijse.userservice.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.List;
 
@@ -17,6 +18,7 @@ public class UserServiceImpl implements UserService{
 
     @Autowired
     private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
 
     private UserResponseDto map(User user){
         return UserResponseDto.builder()
@@ -32,6 +34,10 @@ public class UserServiceImpl implements UserService{
 
     @Override
     public UserResponseDto createUser(UserRequestDto dto) {
+        if (dto.getPassword() == null || dto.getPassword().isBlank()
+                || dto.getPassword().getBytes(java.nio.charset.StandardCharsets.UTF_8).length > 72) {
+            throw new DataPersistException("Password must be non-empty and at most 72 UTF-8 bytes.");
+        }
         if (userRepository.existsByEmail(dto.getEmail())) {
             System.out.println(dto.getEmail() + " : User Email Already Exist");
             throw new DataPersistException(dto.getEmail() + " : User Email Already Exist");
@@ -41,9 +47,9 @@ public class UserServiceImpl implements UserService{
                 .firstName(dto.getFirstName())
                 .lastName(dto.getLastName())
                 .email(dto.getEmail())
-                .password(dto.getPassword())
+                .password(passwordEncoder.encode(dto.getPassword()))
                 .phone(dto.getPhone())
-                .role(dto.getRole())
+                .role("CUSTOMER")
                 .image(dto.getImage())
                 .build();
 
@@ -124,11 +130,6 @@ public class UserServiceImpl implements UserService{
         // Update phone
         if (dto.getPhone() != null && !dto.getPhone().trim().isEmpty()) {
             user.setPhone(dto.getPhone());
-        }
-
-        // Update role
-        if (dto.getRole() != null && !dto.getRole().trim().isEmpty()) {
-            user.setRole(dto.getRole());
         }
 
         // Update image

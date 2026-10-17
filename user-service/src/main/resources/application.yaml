@@ -31,4 +31,8 @@ management:
   endpoints:
     web:
       exposure:
-        include: "*"
+        include: health,info,metrics
+security:
+  jwt:
+    private-key-base64: ${JWT_PRIVATE_KEY_BASE64:}
+    public-key-base64: ${JWT_PUBLIC_KEY_BASE64:}

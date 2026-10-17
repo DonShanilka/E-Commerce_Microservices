@@ -10,6 +10,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import lk.ijse.productservice.dto.ProductSummaryDto;
 
 @Service
 @RequiredArgsConstructor
@@ -114,6 +117,20 @@ public class ProductServiceImpl implements ProductService{
                 .brand(product.getBrand())
                 .image(product.getImage())
                 .build();
+    }
+
+    @Override
+    public Page<ProductSummaryDto> search(String query, String category, String brand, Pageable pageable) {
+        String normalizedQuery = blankToNull(query);
+        String normalizedCategory = blankToNull(category);
+        String normalizedBrand = blankToNull(brand);
+        return productRepository.search(normalizedQuery, normalizedCategory, normalizedBrand, pageable)
+                .map(product -> new ProductSummaryDto(product.getId(), product.getName(), product.getDescription(),
+                        product.getPrice(), product.getQuantity(), product.getCategory(), product.getBrand()));
+    }
+
+    private String blankToNull(String value) {
+        return value == null || value.isBlank() ? null : value.trim();
     }
 
     @Override

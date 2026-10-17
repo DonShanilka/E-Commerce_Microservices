@@ -29,8 +29,8 @@ spring:
   rabbitmq:
     host: localhost
     port: 5672
-    username: guest
-    password: ${RABBITMQ_PASSWORD:guest}
+    username: ${RABBITMQ_USERNAME:}
+    password: ${RABBITMQ_PASSWORD:}
   config:
     import: optional:configserver:http://localhost:8888
 
@@ -55,3 +55,6 @@ logging:
     org.springframework.web: INFO
     org.hibernate.SQL: DEBUG
     org.hibernate.orm.jdbc.bind: TRACE
+security:
+  jwt:
+    public-key-base64: ${JWT_PUBLIC_KEY_BASE64:}

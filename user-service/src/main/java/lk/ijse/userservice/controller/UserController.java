@@ -12,6 +12,9 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.oauth2.jwt.Jwt;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
@@ -31,13 +34,12 @@ public class UserController {
             @RequestPart("email") String email,
             @RequestPart("password") String password,
             @RequestPart("phone") String phone,
-            @RequestPart("role") String role,
-            @RequestPart("image") MultipartFile image
+            @RequestPart(value = "role", required = false) String role,
+            @RequestPart(value = "image", required = false) MultipartFile image
     ){
         try {
 
-            byte[] imageBytes = image.getBytes();
-            String imageBase64 = AppUtil.imageBase64(imageBytes);
+            String imageBase64 = image == null || image.isEmpty() ? null : AppUtil.imageBase64(image.getBytes());
 
             UserRequestDto dto = UserRequestDto.builder()
                             .firstName(firstName)
@@ -60,13 +62,11 @@ public class UserController {
 //                        .body("Email" + " already exists.");
 //            }
 
-            System.out.println("Response User : " + response);
-
             return ResponseEntity.status(HttpStatus.CREATED).body(response);
+        } catch (DataPersistException e) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).body("Account could not be created.");
         } catch (Exception e) {
-            return ResponseEntity
-                    .status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Account request is invalid.");
         }
     }
 
@@ -81,8 +81,10 @@ public class UserController {
             @RequestParam(value = "email", required = false) String email,
             @RequestParam(value = "phone", required = false) String phone,
             @RequestParam(value = "role", required = false) String role,
-            @RequestParam(value = "image", required = false) MultipartFile image
+            @RequestParam(value = "image", required = false) MultipartFile image,
+            @AuthenticationPrincipal Jwt principal
     ) {
+        requireSelfOrAdmin(id, principal);
         try {
 
             String imageBase64 = null;
@@ -147,8 +149,8 @@ public class UserController {
     }
 
     @GetMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> getUserById(@PathVariable Long id) {
-
+    public ResponseEntity<?> getUserById(@PathVariable Long id, @AuthenticationPrincipal Jwt principal) {
+        requireSelfOrAdmin(id, principal);
         try {
             UserResponseDto user = userService.getById(id);
             return ResponseEntity.ok(user);
@@ -163,4 +165,9 @@ public class UserController {
         }
     }
 
+    private void requireSelfOrAdmin(Long id, Jwt principal) {
+        if (principal == null) throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Authentication is required.");
+        if (principal.getClaimAsStringList("roles") != null && principal.getClaimAsStringList("roles").contains("ADMIN")) return;
+        if (!Long.toString(id).equals(principal.getSubject())) throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You may only access your own account.");
+    }
 }
