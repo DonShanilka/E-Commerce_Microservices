@@ -407,7 +407,7 @@ public class AiController {
         if (aiKey == null || aiKey.isBlank()) {
             throw new ResponseStatusException(
                     HttpStatus.SERVICE_UNAVAILABLE,
-                    "Set AI_API_KEY environment variable."
+                    "Set ai.api.key in ai-service/src/main/resources/application-local.yaml."
             );
         }
 

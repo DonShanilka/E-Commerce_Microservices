@@ -40,10 +40,10 @@ Default port: 8087. Product Service is expected at `http://localhost:8082` and c
 
 ## Other service security and catalog setup
 
-- User Service exposes `POST /api/v1/users/authenticate` with JSON `{"email":"...","password":"..."}` and returns a 15-minute bearer JWT. Tokens use RS256. User Service holds the private key; Product Service receives only the public key. New passwords use BCrypt; legacy plaintext passwords are upgraded after a successful login. Public registration always creates a `CUSTOMER`; assign the first `ADMIN` through a controlled database migration/administrative process.
+- User Service exposes `POST /api/v1/users/authenticate` with JSON `{"email":"...","password":"..."}` and returns a 15-minute bearer JWT signed with HS256. New passwords use BCrypt; legacy plaintext passwords are upgraded after a successful login. Public registration always creates a `CUSTOMER`; assign the first `ADMIN` through a controlled database migration/administrative process.
 - User profile reads/updates require a bearer token and are limited to the owner or an administrator. User listing/deletion and product create/update/delete require the `ADMIN` role.
 - Product `GET /api/v1/products` now accepts `page` (zero-based, default 0), `size` (default 20, maximum 100), `query`, `category`, and `brand`. It returns a page of summaries without image data; `GET /{id}` still returns the full product.
-- Set `JWT_PRIVATE_KEY_BASE64` and `JWT_PUBLIC_KEY_BASE64` in User Service; set only `JWT_PUBLIC_KEY_BASE64` in Product Service. Generate a 3072-bit RSA key outside the repository, then Base64-encode its PKCS#8 private DER and X.509 public DER. Set `DB_PASSWORD` for every database-backed service and `RABBITMQ_USERNAME`/`RABBITMQ_PASSWORD` for Product, Order, and Inventory services. The RabbitMQ guest fallback was removed.
+- Set the same `JWT_SECRET_BASE64` value in User Service, Product Service, and the server-side frontend configuration. Generate a random secret with `openssl rand -base64 32`; keep it out of source control and never expose it with a `NEXT_PUBLIC_` prefix. Set `DB_PASSWORD` for every database-backed service and `RABBITMQ_USERNAME`/`RABBITMQ_PASSWORD` for Product, Order, and Inventory services. The RabbitMQ guest fallback was removed.
 - Existing plain-text user passwords migrate to BCrypt when that account logs in. The previously exposed PostgreSQL password is not changed by these code changes; rotate it in PostgreSQL and then update `DB_PASSWORD`.
 
 ## Database-backed endpoints
@@ -83,19 +83,17 @@ Pass historical sales points from your Order Service; do not send fabricated sam
 curl -X POST http://localhost:8087/api/v1/ai/forecast -H 'Content-Type: application/json' -d '{"history":[{"date":"2026-09-01","unitsSold":12},{"date":"2026-09-08","unitsSold":15},{"date":"2026-09-15","unitsSold":14},{"date":"2026-09-22","unitsSold":18}],"periodsAhead":2}'
 ```
 
-Generate signing keys locally without saving them in the repository:
+Generate the shared JWT secret locally without saving it in the repository:
 
 ```bash
-openssl genpkey -algorithm RSA -pkeyopt rsa_keygen_bits:3072 -out /tmp/ecommerce-jwt-private.pem
-openssl pkey -in /tmp/ecommerce-jwt-private.pem -outform DER | base64 | tr -d '\n'
-openssl pkey -in /tmp/ecommerce-jwt-private.pem -pubout -outform DER | base64 | tr -d '\n'
+openssl rand -base64 32
 ```
 
-The first command's output is the private-key environment value and the second is the public-key value. Store the private value only in User Service's secret configuration.
+Use the generated value for `JWT_SECRET_BASE64` in User Service, Product Service, and the server-side frontend. Any service holding this HMAC secret can issue JWTs, so only trusted services should receive it.
 
 ## Current limitations
 
-- User Service issues end-user RS256 JWTs. A trusted backend must still validate the caller and authorize access before signing the short-lived HMAC assertion described above for AI user-history routes. The shared key must never reach a browser.
+- User Service issues end-user HS256 JWTs. A trusted backend must still validate the caller and authorize access before signing the separate short-lived HMAC assertion described above for AI user-history routes. The shared JWT secret must remain server-side.
 - Product Service supports pagination and filtering. AI Service follows catalog pages, caches the result briefly, and caps traversal at 10,000 products; very large catalogs should use a dedicated server-side search integration.
 - Forecasts use up to 180 days of completed sales, zero-fill dates without orders, and return a bounded baseline with uncertainty. Promotions, stockouts, holidays, and marketing activity are not available in current data.
 - Provider token counts are reported when the provider returns them. Cost is not estimated because model pricing is provider- and date-dependent.

@@ -5,6 +5,9 @@ spring:
   application:
     name: product-service
 
+  profiles:
+    default: local
+
   datasource:
     url: jdbc:postgresql://localhost:5432/product_db
     username: postgres
@@ -57,4 +60,3 @@ logging:
     org.hibernate.orm.jdbc.bind: TRACE
 security:
   jwt:
-    public-key-base64: ${JWT_PUBLIC_KEY_BASE64:}

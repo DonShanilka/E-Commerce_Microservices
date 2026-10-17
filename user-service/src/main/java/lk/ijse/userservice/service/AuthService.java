@@ -8,7 +8,7 @@ import lk.ijse.userservice.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.oauth2.jose.jws.SignatureAlgorithm;
+import org.springframework.security.oauth2.jose.jws.MacAlgorithm;
 import org.springframework.security.oauth2.jwt.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -51,7 +51,7 @@ public class AuthService {
                 .issuedAt(now).expiresAt(now.plus(TOKEN_TTL_SECONDS, ChronoUnit.SECONDS))
                 .subject(user.getId().toString()).claim("email", user.getEmail())
                 .claim("roles", List.of(role)).build();
-        JwsHeader header = JwsHeader.with(SignatureAlgorithm.RS256).build();
+        JwsHeader header = JwsHeader.with(MacAlgorithm.HS256).build();
         String token = jwtEncoder.encode(JwtEncoderParameters.from(header, claims)).getTokenValue();
         UserResponseDto profile = UserResponseDto.builder().id(user.getId()).firstName(user.getFirstName())
                 .lastName(user.getLastName()).email(user.getEmail()).phone(user.getPhone()).role(role)

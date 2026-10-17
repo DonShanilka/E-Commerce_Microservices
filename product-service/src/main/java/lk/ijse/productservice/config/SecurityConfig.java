@@ -6,7 +6,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.oauth2.jose.jws.SignatureAlgorithm;
+import org.springframework.security.oauth2.jose.jws.MacAlgorithm;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.oauth2.jwt.JwtValidators;
 import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
@@ -14,38 +14,34 @@ import org.springframework.security.oauth2.server.resource.authentication.JwtAut
 import org.springframework.security.oauth2.server.resource.authentication.JwtGrantedAuthoritiesConverter;
 import org.springframework.security.web.SecurityFilterChain;
 
-import java.security.KeyFactory;
-import java.security.interfaces.RSAPublicKey;
-import java.security.spec.X509EncodedKeySpec;
+import javax.crypto.SecretKey;
+import javax.crypto.spec.SecretKeySpec;
 import java.util.Base64;
 
 @Configuration
 public class SecurityConfig {
     @Bean
-    RSAPublicKey jwtPublicKey(@Value("${security.jwt.public-key-base64:}") String publicKeyBase64) {
-        if (publicKeyBase64 == null || publicKeyBase64.isBlank()) {
-            throw new IllegalStateException("Set JWT_PUBLIC_KEY_BASE64 to the User Service RSA public key.");
+    SecretKey jwtSecretKey(@Value("${security.jwt.secret-base64:}") String secretBase64) {
+        if (secretBase64 == null || secretBase64.isBlank()) {
+            throw new IllegalStateException("Set JWT_SECRET_BASE64 to the User Service shared secret.");
         }
+
         try {
-            byte[] encoded = Base64.getDecoder().decode(publicKeyBase64);
-            RSAPublicKey key = (RSAPublicKey) KeyFactory.getInstance("RSA")
-                    .generatePublic(new X509EncodedKeySpec(encoded));
-            if (key.getModulus().bitLength() < 2048) {
-                throw new IllegalStateException("JWT RSA public key must be at least 2048 bits.");
+            byte[] secret = Base64.getDecoder().decode(secretBase64.trim());
+            if (secret.length < 32) {
+                throw new IllegalStateException("JWT_SECRET_BASE64 must decode to at least 32 bytes.");
             }
-            return key;
-        } catch (IllegalArgumentException | java.security.GeneralSecurityException e) {
-            throw new IllegalStateException("JWT_PUBLIC_KEY_BASE64 must contain a valid X.509 encoded RSA public key.", e);
+            return new SecretKeySpec(secret, "HmacSHA256");
+        } catch (IllegalArgumentException e) {
+            throw new IllegalStateException("JWT_SECRET_BASE64 must be a Base64-encoded secret key, not a JWT token.", e);
         }
     }
 
     @Bean
-    JwtDecoder jwtDecoder(RSAPublicKey jwtPublicKey) {
-        NimbusJwtDecoder decoder = NimbusJwtDecoder.withPublicKey(jwtPublicKey)
-                .signatureAlgorithm(SignatureAlgorithm.RS256)
+    JwtDecoder jwtDecoder(SecretKey jwtSecretKey) {
+        return NimbusJwtDecoder.withSecretKey(jwtSecretKey)
+                .macAlgorithm(MacAlgorithm.HS256)
                 .build();
-        decoder.setJwtValidator(JwtValidators.createDefaultWithIssuer("ecommerce-user-service"));
-        return decoder;
     }
 
     @Bean

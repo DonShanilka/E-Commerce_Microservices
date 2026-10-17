@@ -5,6 +5,9 @@ spring:
   application:
     name: user-service
 
+  profiles:
+    default: local
+
   config:
     import: optional:configserver:http://localhost:8888
 
@@ -33,6 +36,4 @@ management:
       exposure:
         include: health,info,metrics
 security:
-  jwt:
-    private-key-base64: ${JWT_PRIVATE_KEY_BASE64:}
-    public-key-base64: ${JWT_PUBLIC_KEY_BASE64:}
+  jwt: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWUsImlhdCI6MTUxNjIzOTAyMn0.KMUFsIDTnFmyG3nMiGM6H9FNFUROf3wh7SmqJp-QV30

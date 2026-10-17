@@ -38,3 +38,6 @@ out/
 
 # macOS files
 .DS_Store
+
+# Local-only JWT configuration (do not commit signing secrets)
+**/src/main/resources/application-local.yaml

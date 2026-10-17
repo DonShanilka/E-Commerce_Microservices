@@ -26,7 +26,7 @@ Open the root directory as the IntelliJ project. Each service is a separate Grad
 
 On Windows, use `gradlew.bat bootRun`. Start the Config Server and Eureka Server before the services that register with Eureka or import remote configuration. Start PostgreSQL, RabbitMQ, and Redis before the services that use them. The services remain independently runnable; no single command starts the whole system.
 
-Local PostgreSQL credentials are configured in the application YAML files for the database-backed services. JWT signing keys, the AI provider key, and internal service keys are still supplied through each service's IntelliJ run configuration because they are separate secrets.
+Local PostgreSQL credentials are configured in the application YAML files for the database-backed services. Set the same Base64 `JWT_SECRET_BASE64` value in the User Service and Product Service IntelliJ run configurations, and in the frontend server environment. Generate it with `openssl rand -base64 32`; keep it private and out of source control. The AI provider key and internal service keys are supplied through the relevant service run configurations.
 
 ## Run tests
 

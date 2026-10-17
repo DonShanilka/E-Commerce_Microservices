@@ -6,29 +6,16 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 
-import java.security.KeyPair;
-import java.security.KeyPairGenerator;
 import java.util.Base64;
 
 @SpringBootTest
 @ActiveProfiles("test")
 class UserServiceApplicationTests {
-    private static final KeyPair TEST_KEYS = createTestKeys();
+    private static final String TEST_SECRET = Base64.getEncoder().encodeToString(new byte[32]);
 
     @DynamicPropertySource
-    static void jwtKeys(DynamicPropertyRegistry properties) {
-        properties.add("security.jwt.private-key-base64", () -> Base64.getEncoder().encodeToString(TEST_KEYS.getPrivate().getEncoded()));
-        properties.add("security.jwt.public-key-base64", () -> Base64.getEncoder().encodeToString(TEST_KEYS.getPublic().getEncoded()));
-    }
-
-    private static KeyPair createTestKeys() {
-        try {
-            KeyPairGenerator generator = KeyPairGenerator.getInstance("RSA");
-            generator.initialize(2048);
-            return generator.generateKeyPair();
-        } catch (Exception e) {
-            throw new ExceptionInInitializerError(e);
-        }
+    static void jwtSecret(DynamicPropertyRegistry properties) {
+        properties.add("security.jwt.secret-base64", () -> TEST_SECRET);
     }
 
     @Test
