@@ -57,6 +57,12 @@ public class ReviewServiceImpl implements ReviewService {
 
     @Override
     @Transactional(readOnly = true)
+    public List<ReviewResponseDto> getRecentByProductId(Long productId) {
+        return reviewRepository.findTop100ByProductIdOrderByCreatedAtDesc(productId).stream().map(this::toDto).toList();
+    }
+
+    @Override
+    @Transactional(readOnly = true)
     public List<ReviewResponseDto> getByUserId(Long userId) {
         return reviewRepository.findByUserId(userId).stream().map(this::toDto).toList();
     }

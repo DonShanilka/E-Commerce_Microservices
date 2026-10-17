@@ -10,6 +10,7 @@ import lk.ijse.orderservice.entity.OrderStatus;
 import lk.ijse.orderservice.repository.OrderRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -79,11 +80,19 @@ public class OrderServiceImpl implements OrderService{
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<OrderResponseDto> getByUserId(Long userId) {
         return orderRepository.findByUserId(userId)
                 .stream()
                 .map(this::mapToResponse)
                 .toList();
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<OrderResponseDto> getRecentByUserId(Long userId) {
+        return orderRepository.findTop100ByUserIdOrderByCreatedAtDesc(userId)
+                .stream().map(this::mapToResponse).toList();
     }
 
     @Override

@@ -32,3 +32,6 @@ management:
   endpoint:
     health:
       show-details: when_authorized
+
+ai:
+  internal-api-key: ${AI_INTERNAL_API_KEY:}
