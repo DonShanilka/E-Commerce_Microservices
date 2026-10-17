@@ -36,11 +36,12 @@ public class OrderServiceImpl implements OrderService{
 
         for (OrderItemRequestDto itemDto : dto.getItems()) {
 
-            BigDecimal price = BigDecimal.ZERO;
+            BigDecimal price = itemDto.getPrice();
             BigDecimal subtotal = price.multiply(BigDecimal.valueOf(itemDto.getQuantity()));
 
             OrderItem item = OrderItem.builder()
                     .productId(itemDto.getProductId())
+                    .productName(itemDto.getProductName())
                     .quantity(itemDto.getQuantity())
                     .price(price)
                     .subtotal(subtotal)
