@@ -18,7 +18,7 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-public class CartServiceImpl implements CartService{
+public class CartServiceImpl implements CartService {
 
     private final CartRepository cartRepository;
 
@@ -85,39 +85,39 @@ public class CartServiceImpl implements CartService{
     @Override
     public CartResponseDto updateQuantity(Long userId, Long productId, Integer quantity) {
 
-            Cart cart = cartRepository.findByUserId(userId);
-            if (cart == null) {
-                throw new RuntimeException("Cart not found");
-            }
+        Cart cart = cartRepository.findByUserId(userId);
+        if (cart == null) {
+            throw new RuntimeException("Cart not found");
+        }
 
-            CartItem item = cart.getItems()
-                    .stream()
-                    .filter(i -> i.getProductId().equals(productId))
-                    .findFirst()
-                    .orElseThrow(() ->
-                            new RuntimeException("Product not found in cart"));
+        CartItem item = cart.getItems()
+                .stream()
+                .filter(i -> i.getProductId().equals(productId))
+                .findFirst()
+                .orElseThrow(() ->
+                        new RuntimeException("Product not found in cart"));
 
-            item.setQuantity(quantity);
-            item.setSubtotal(item.getPrice() * quantity);
+        item.setQuantity(quantity);
+        item.setSubtotal(item.getPrice() * quantity);
 
-            calculateTotal(cart);
-            cartRepository.save(cart);
+        calculateTotal(cart);
+        cartRepository.save(cart);
 
-            return convertToResponse(cart);
+        return convertToResponse(cart);
     }
 
     @Override
     public void removeFromCart(Long userId, Long productId) {
 
-            Cart cart = cartRepository.findByUserId(userId);
-            if (cart == null) {
-                throw new RuntimeException("Cart not found");
-            }
+        Cart cart = cartRepository.findByUserId(userId);
+        if (cart == null) {
+            throw new RuntimeException("Cart not found");
+        }
 
-            cart.getItems().removeIf(item -> item.getProductId().equals(productId));
+        cart.getItems().removeIf(item -> item.getProductId().equals(productId));
 
-            calculateTotal(cart);
-            cartRepository.save(cart);
+        calculateTotal(cart);
+        cartRepository.save(cart);
     }
 
     @Override

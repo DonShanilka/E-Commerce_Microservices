@@ -18,7 +18,12 @@ public class AiRateLimitFilter extends OncePerRequestFilter {
         private double tokens;
         private long updatedAt;
         private volatile long lastSeen;
-        private Bucket(double capacity, long now) { tokens = capacity; updatedAt = now; lastSeen = now; }
+
+        private Bucket(double capacity, long now) {
+            tokens = capacity;
+            updatedAt = now;
+            lastSeen = now;
+        }
     }
 
     private final ConcurrentHashMap<String, Bucket> buckets = new ConcurrentHashMap<>();

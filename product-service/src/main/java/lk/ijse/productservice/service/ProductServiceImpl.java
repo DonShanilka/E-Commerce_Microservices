@@ -121,16 +121,16 @@ public class ProductServiceImpl implements ProductService{
 
     @Override
     public Page<ProductSummaryDto> search(String query, String category, String brand, Pageable pageable) {
-        String normalizedQuery = blankToNull(query);
-        String normalizedCategory = blankToNull(category);
-        String normalizedBrand = blankToNull(brand);
+        String normalizedQuery = blankToEmpty(query);
+        String normalizedCategory = blankToEmpty(category);
+        String normalizedBrand = blankToEmpty(brand);
         return productRepository.search(normalizedQuery, normalizedCategory, normalizedBrand, pageable)
                 .map(product -> new ProductSummaryDto(product.getId(), product.getName(), product.getDescription(),
                         product.getPrice(), product.getQuantity(), product.getCategory(), product.getBrand()));
     }
 
-    private String blankToNull(String value) {
-        return value == null || value.isBlank() ? null : value.trim();
+    private String blankToEmpty(String value) {
+        return value == null || value.isBlank() ? "" : value.trim();
     }
 
     @Override

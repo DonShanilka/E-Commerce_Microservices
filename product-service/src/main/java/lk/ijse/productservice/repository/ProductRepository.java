@@ -17,10 +17,10 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
 
     @Query("""
             select p from Product p where
-            (:query is null or lower(p.name) like lower(concat('%', :query, '%'))
+            (:query = '' or lower(p.name) like lower(concat('%', :query, '%'))
              or lower(coalesce(p.description, '')) like lower(concat('%', :query, '%')))
-            and (:category is null or lower(coalesce(p.category, '')) = lower(:category))
-            and (:brand is null or lower(coalesce(p.brand, '')) = lower(:brand))""")
+            and (:category = '' or lower(coalesce(p.category, '')) = lower(:category))
+            and (:brand = '' or lower(coalesce(p.brand, '')) = lower(:brand))""")
     Page<Product> search(@Param("query") String query, @Param("category") String category,
                          @Param("brand") String brand, Pageable pageable);
     List<Product> findByCategory(String category);

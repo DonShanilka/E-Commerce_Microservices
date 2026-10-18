@@ -5,6 +5,9 @@ spring:
   application:
     name: order-service
 
+  profiles:
+    default: local
+
   datasource:
     url: jdbc:postgresql://localhost:5432/order_db
     username: postgres
