@@ -126,7 +126,8 @@ public class ProductServiceImpl implements ProductService{
         String normalizedBrand = blankToEmpty(brand);
         return productRepository.search(normalizedQuery, normalizedCategory, normalizedBrand, pageable)
                 .map(product -> new ProductSummaryDto(product.getId(), product.getName(), product.getDescription(),
-                        product.getPrice(), product.getQuantity(), product.getCategory(), product.getBrand()));
+                        product.getPrice(), product.getQuantity(), product.getCategory(), product.getBrand(),
+                        product.getImage()));
     }
 
     private String blankToEmpty(String value) {

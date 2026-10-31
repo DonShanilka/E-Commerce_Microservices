@@ -36,22 +36,22 @@ public class UserController {
             @RequestPart("phone") String phone,
             @RequestPart(value = "role", required = false) String role,
             @RequestPart(value = "image", required = false) MultipartFile image
-    ){
+    ) {
         try {
 
             String imageBase64 = image == null || image.isEmpty() ? null : AppUtil.imageBase64(image.getBytes());
 
             UserRequestDto dto = UserRequestDto.builder()
-                            .firstName(firstName)
-                            .lastName(lastName)
-                            .email(email)
-                            .password(password)
-                            .phone(phone)
-                            .role(role)
-                            .image(imageBase64)
+                    .firstName(firstName)
+                    .lastName(lastName)
+                    .email(email)
+                    .password(password)
+                    .phone(phone)
+                    .role(role)
+                    .image(imageBase64)
 //                            .imageName(image.getOriginalFilename())
 //                            .imageType(image.getContentType())
-                            .build();
+                    .build();
 
             UserResponseDto response = userService.createUser(dto);
 
@@ -166,8 +166,11 @@ public class UserController {
     }
 
     private void requireSelfOrAdmin(Long id, Jwt principal) {
-        if (principal == null) throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Authentication is required.");
-        if (principal.getClaimAsStringList("roles") != null && principal.getClaimAsStringList("roles").contains("ADMIN")) return;
-        if (!Long.toString(id).equals(principal.getSubject())) throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You may only access your own account.");
+        if (principal == null)
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Authentication is required.");
+        if (principal.getClaimAsStringList("roles") != null && principal.getClaimAsStringList("roles").contains("ADMIN"))
+            return;
+        if (!Long.toString(id).equals(principal.getSubject()))
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You may only access your own account.");
     }
 }
